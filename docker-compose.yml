@@ -1,0 +1,42 @@
+services:
+  robot-basketball:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tesp_robot_basketball
+    # Mount the whole repository into the container so edits made on the
+    # host (or inside the container) are shared both ways.
+    volumes:
+      - .:/workspace
+      # X11 socket, needed for GUI tools such as rviz2 on Linux hosts.
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    # Host networking is used because ROS 2 DDS discovery and communication
+    # with lab robots is usually much simpler with host networking than
+    # with Docker's default bridge network. This mode is Linux-only.
+    network_mode: host
+    environment:
+      - ROS_DOMAIN_ID=30
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+      # DISPLAY is forwarded so GUI tools (rviz2, rqt) can render on the
+      # host's X server. On Linux, run `xhost +local:docker` on the host
+      # first. On macOS/Windows, GUI support requires an extra X server
+      # (e.g. XQuartz or VcXsrv) and is not configured here by default.
+      - DISPLAY=${DISPLAY}
+
+    # -------------------------------------------------------------------
+    # Real hardware access (USB serial devices, motor controllers, etc.)
+    # is disabled by default. Uncomment and edit the lines below only
+    # when connecting to real robot hardware, and only after the
+    # instructor has confirmed it is safe to do so.
+    #
+    # devices:
+    #   - /dev/ttyUSB0:/dev/ttyUSB0
+    #
+    # group_add:
+    #   - dialout
+    #
+    # privileged: true
+    # -------------------------------------------------------------------

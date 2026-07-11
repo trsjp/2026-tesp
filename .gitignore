@@ -1,29 +1,8 @@
-# Dependencies
-node_modules/
-*.o
-*.a
-*.so
-
-# Build artifacts
-dist/
-build/
-target/
-
-# Environment
-.env
-.env.local
-.env.*.local
-
-# IDE
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+**/__pycache__/
+*.pyc
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
-
-# OS
 .DS_Store
-Thumbs.db
-
-# Logs
-*.log
