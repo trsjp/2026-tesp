@@ -7,31 +7,58 @@ is intentionally left as a TODO).
 
 | Component | Purpose | Target folder | Upstream URL | Notes |
 |---|---|---|---|---|
-| iCart mini | Mobile base drivers, description, bringup, navigation support | `ros2_ws/src/icart_mini` | **TODO** — see below | No ROS 2 branch exists upstream. Left unset in `clone_repos.sh` on purpose. |
+| iCart mini (`icart-ros2`) | Mobile base drivers, description, ros2_control, Gazebo sim, param/udev setup, YP-Spur bridge | `ros2_ws/src/icart-ros2` | https://github.com/CRG-Tohoku/icart-ros2 (branch: `worktree-ros2-jazzy-migration`) | 6 colcon packages + `ypspur_ros2` git submodule in one repo — see below. |
 | Gello | Lead-arm teleoperation controller | `ros2_ws/src/gello` | https://github.com/wuphilipp/gello_software (branch: `main`) | Standalone Python project, not a colcon package — see below. |
 | ROBOTIS OpenManipulator | Arm description, control, MoveIt config, hardware interface | `ros2_ws/src/open_manipulator` | https://github.com/ROBOTIS-GIT/open_manipulator (branch: `jazzy`) | Official ROS 2 Jazzy support confirmed. MoveIt config bundled. |
 | — companion: dynamixel_hardware_interface | `ros2_control` hardware interface plugin for the arm | `ros2_ws/src/dynamixel_hardware_interface` | https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface (branch: `jazzy`) | Required by OpenManipulator. Built from source via colcon. |
 | — companion: dynamixel_interfaces | Custom msg/srv interfaces for Dynamixel actuators | `ros2_ws/src/dynamixel_interfaces` | https://github.com/ROBOTIS-GIT/dynamixel_interfaces (branch: `jazzy`) | Required by OpenManipulator. Built from source via colcon. |
 | — companion: DynamixelSDK | Dynamixel actuator SDK | `ros2_ws/src/DynamixelSDK` | https://github.com/ROBOTIS-GIT/DynamixelSDK (branch: `jazzy`) | Required by OpenManipulator. Built from source via colcon. |
 
-## iCart mini: no ROS 2 support upstream
+## iCart mini: ROS 2 Jazzy migration (CRG-Tohoku fork)
 
 `open-rdc/icart` (the iCart mini repository) has **no ROS 2 branch at
 all** — every branch (`indigo-devel`, `kinetic-devel`, `melodic-devel`,
 `noetic-devel`, etc.) is ROS1/catkin. There is no `jazzy`, `humble`, or
-`foxy` branch, and no `ros2` fork maintained by the same org.
-
-An unofficial community port exists at
+`foxy` branch, and no `ros2` fork maintained by the same org. An
+unofficial community port exists at
 `https://github.com/haruyama8940/icart_mini_driver_ros2` (branch `main`),
-but it is:
-- unmaintained (last commit June 2023, developed against Foxy-era ROS 2),
-- untested on Jazzy/Ubuntu 24.04,
-- incomplete (driver node only — no description or Gazebo packages).
+but it is unmaintained (last commit June 2023, developed against
+Foxy-era ROS 2), untested on Jazzy/Ubuntu 24.04, and incomplete (driver
+node only — no description or Gazebo packages).
 
-`ICART_MINI_REPO_URL` is left as `TODO` in `scripts/clone_repos.sh` until
-the instructor decides how to proceed (evaluate the unofficial port, plan
-a ROS1→ROS2 port, or find another upstream source). Do not clone the
-ROS1 repo into the ROS2 workspace expecting it to build.
+`CRG-Tohoku/icart-ros2` (branch `worktree-ros2-jazzy-migration`) is an
+instructor-authored ROS 2 Jazzy migration, forked from `open-rdc/icart`.
+**This is an active, in-progress branch, not a pinned stable release** —
+if it moves or is renamed, re-verify the package/dependency breakdown
+below against the branch before trusting it.
+
+It is a single repo containing 6 colcon packages as subdirectories, plus
+one git submodule:
+
+| Package | Role |
+|---|---|
+| `icart_mini` | Meta package, depends on the other 5 |
+| `icart_mini_description` | URDF/xacro robot model |
+| `icart_mini_control` | `ros2_control` controller config (diff drive) |
+| `icart_mini_driver` | Real-hardware bringup (YP-Spur bridge, lidar, joystick teleop) |
+| `icart_mini_gazebo` | Gazebo (`gz-sim`) simulation launch/config |
+| `icart_mini_setup` | Parameter/udev-rule generation scripts + tests |
+| `ypspur_ros2` (submodule → `CRG-Tohoku/ypspur_ros2`) | ROS 2 bridge to the non-ROS `yp-spur` C motor-controller library. This fork carries Jazzy-specific fixes not present upstream. |
+
+`clone_repos.sh` clones this with `--recurse-submodules` to pull
+`ypspur_ros2` along with the main repo. colcon discovers all 6 nested
+packages recursively — no per-package clone entries needed.
+
+Two build-time system dependencies fall outside what `rosdep install`
+can resolve, and are handled directly in the shared `Dockerfile`:
+
+- **`yp-spur`** — `ypspur_ros2`'s `CMakeLists.txt` does
+  `find_package(ypspur 1.20.0 REQUIRED)`; there is no rosdep key for it.
+  The Dockerfile builds it from source
+  (`openspur/yp-spur` → `./configure && make && make install`).
+- **Gazebo simulation support** (`ros-jazzy-ros-gz`,
+  `ros-jazzy-gz-ros2-control`) — previously out of scope for this
+  image; now installed because `icart_mini_gazebo` needs it.
 
 ## Gello: standalone Python project, not a colcon package
 
