@@ -78,6 +78,22 @@
 - **Possible fix:** `source ros2_ws/install/setup.bash` in every new shell
   that needs the workspace.
 
+## Permission denied editing files created by the container
+
+- **Symptom:** Files under `ros2_ws` (e.g. `build/`, `install/`, or a repo
+  cloned from inside the container) can't be edited or deleted from the
+  host without `sudo`.
+- **Likely cause:** The container's `ros` user was built with a UID/GID
+  that doesn't match your host user, so files it creates on the
+  bind-mounted `/workspace` are owned by a different UID.
+- **First checks:** `ls -ln ros2_ws` on the host and compare the numeric
+  owner to `id -u` / `id -g` for your user.
+- **Possible fix:** Rebuild the image so it matches your current host
+  user: `bash scripts/docker_build.sh` (it auto-detects your UID/GID).
+  Prefer cloning external repos on the host with `scripts/clone_repos.sh`
+  before starting the container, rather than inside it, to avoid this
+  case entirely.
+
 ## USB/serial permission issue
 
 - **Symptom:** `Permission denied` opening `/dev/ttyUSB0` or similar.

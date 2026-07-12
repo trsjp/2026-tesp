@@ -32,6 +32,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     iputils-ping \
     net-tools \
     udev \
+    libusb-1.0-0-dev \
+    # ^ libusb-1.0-0-dev: needed by DynamixelSDK for USB-serial (U2D2)
+    #   access when building the OpenManipulator arm packages from source.
     && rm -rf /var/lib/apt/lists/*
 
 # ---------------------------------------------------------------------------
@@ -53,7 +56,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-jazzy-robot-state-publisher \
     ros-jazzy-rviz2 \
     ros-jazzy-teleop-twist-keyboard \
+    ros-jazzy-ros2-control \
+    ros-jazzy-ros2-controllers \
     && rm -rf /var/lib/apt/lists/*
+
+# ros2-control/ros2-controllers above are needed by the OpenManipulator
+# arm's dynamixel_hardware_interface package (a ros2_control plugin).
+#
+# The OpenManipulator-family source packages themselves — DynamixelSDK,
+# dynamixel_interfaces, dynamixel_hardware_interface, and their further
+# dependency robotis_interfaces — are intentionally NOT apt-installed
+# here. They are cloned as source by scripts/clone_repos.sh into
+# ros2_ws/src and built from source by `rosdep install` + `colcon build`
+# in scripts/setup_workspace.sh, matching ROBOTIS's own official Jazzy
+# Docker workflow (avoids guessing apt package names/versions).
+#
+# Optional/out of scope for the default setup, not installed here:
+# - Gazebo simulation support (ros-jazzy-ros-gz-*, ros-jazzy-gz-ros2-control)
+# - RealSense camera support (ros-jazzy-realsense2-description, libglfw3-dev)
+# If a class needs either, add them here and document why.
 
 # Optional package, not installed by default because availability varies by
 # platform/architecture: ros-jazzy-tf-transformations
@@ -63,8 +84,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # ---------------------------------------------------------------------------
 # Non-root user
+#
+# USER_UID/USER_GID are passed as build args (see docker-compose.yml and
+# scripts/docker_build.sh) so the "ros" user inside the container matches
+# the host user running Docker. This keeps files created inside the
+# container (colcon build output, cloned repos under ros2_ws/src) owned by
+# the student's own host user on the bind-mounted /workspace, instead of a
+# foreign UID that would need sudo to edit or delete from the host.
 # ---------------------------------------------------------------------------
-RUN useradd -m -s /bin/bash ros \
+ARG USER_UID=1000
+ARG USER_GID=1000
+
+RUN if getent passwd "${USER_UID}" > /dev/null; then \
+        userdel -r "$(getent passwd "${USER_UID}" | cut -d: -f1)"; \
+    fi \
+    && if getent group "${USER_GID}" > /dev/null; then \
+        groupdel "$(getent group "${USER_GID}" | cut -d: -f1)"; \
+    fi \
+    && groupadd -g "${USER_GID}" ros \
+    && useradd -m -u "${USER_UID}" -g "${USER_GID}" -s /bin/bash ros \
     && usermod -aG sudo ros \
     && echo "ros ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 

@@ -3,13 +3,29 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      # Build the "ros" user with the host user's UID/GID (auto-detected by
+      # scripts/docker_build.sh) so files created inside the container stay
+      # owned by the student on the host. Falls back to 1000:1000 if built
+      # directly with `docker compose build` without those env vars set.
+      args:
+        USER_UID: ${USER_UID:-1000}
+        USER_GID: ${USER_GID:-1000}
     container_name: tesp_robot_basketball
     # Mount the whole repository into the container so edits made on the
-    # host (or inside the container) are shared both ways.
+    # host (or inside the container) are shared both ways. This is also
+    # what makes repos cloned on the host by scripts/clone_repos.sh (run
+    # before starting the container) immediately visible inside it.
     volumes:
       - .:/workspace
       # X11 socket, needed for GUI tools such as rviz2 on Linux hosts.
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      # Full /dev passthrough so sensors/cameras attached to the host
+      # (beyond the specific USB serial devices below) are visible inside
+      # the container. This grants the container access to ALL host
+      # devices, similar in practice to broad hardware access — only run
+      # this on the lab machine connected to the robot, and follow the
+      # same safety rules as real hardware (see docs/setup.md#safety-warning).
+      - /dev:/dev
     working_dir: /workspace
     stdin_open: true
     tty: true
@@ -17,6 +33,12 @@ services:
     # with lab robots is usually much simpler with host networking than
     # with Docker's default bridge network. This mode is Linux-only.
     network_mode: host
+    # GPU render nodes (for hardware-accelerated rendering/video, e.g.
+    # camera pipelines or RViz) and audio devices, passed through
+    # explicitly in addition to the /dev:/dev mount above.
+    devices:
+      - /dev/dri:/dev/dri
+      - /dev/snd:/dev/snd
     environment:
       - ROS_DOMAIN_ID=30
       - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
@@ -27,12 +49,12 @@ services:
       - DISPLAY=${DISPLAY}
 
     # -------------------------------------------------------------------
-    # Real hardware access (USB serial devices, motor controllers, etc.)
-    # is disabled by default. Uncomment and edit the lines below only
-    # when connecting to real robot hardware, and only after the
-    # instructor has confirmed it is safe to do so.
+    # Additional per-device hardware access (USB serial devices, motor
+    # controllers, etc.) beyond the /dev:/dev + dri/snd passthrough above.
+    # Uncomment and edit only when connecting to real robot hardware, and
+    # only after the instructor has confirmed it is safe to do so.
     #
-    # devices:
+    # Add extra entries to the `devices:` list above, e.g.:
     #   - /dev/ttyUSB0:/dev/ttyUSB0
     #
     # group_add:

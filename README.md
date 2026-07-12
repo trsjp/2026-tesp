@@ -21,8 +21,11 @@ for the full guide.
 
 Use this when students do not already have a stable ROS 2 Jazzy installation.
 
+On the host (only `git` is needed for the clone step, not ROS):
+
 ```bash
 bash scripts/docker_build.sh
+bash scripts/clone_repos.sh
 bash scripts/docker_shell.sh
 ```
 
@@ -30,7 +33,6 @@ Inside the container:
 
 ```bash
 bash scripts/check_environment.sh
-bash scripts/clone_repos.sh
 bash scripts/setup_workspace.sh
 source ros2_ws/install/setup.bash
 ```

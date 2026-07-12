@@ -18,10 +18,32 @@
 See [Hardware access](#hardware-access) and
 [ROS 2 networking](#ros-2-networking) below.
 
+## Keeping the workspace in sync (bind mount + UID/GID matching)
+
+The whole repository is bind-mounted into the container at `/workspace`
+(see the `volumes:` entry in `docker-compose.yml`), not copied into the
+image. That means:
+
+- Any file created or edited on the host — including repos cloned into
+  `ros2_ws/src` — is immediately visible inside the container, and vice
+  versa. There is no separate "sync" step.
+- The container's `ros` user is built with your host user's UID/GID
+  (auto-detected by `scripts/docker_build.sh`), so files created *inside*
+  the container (colcon's `build/`, `install/`, `log/`, or repos cloned
+  in-container) come out owned by you on the host — not a foreign UID
+  that would need `sudo` to edit or delete.
+- If files ever do show up with the wrong owner on the host (e.g. after
+  pulling the image on a different machine, or if the image was built
+  before this UID/GID matching was added), rerun
+  `bash scripts/docker_build.sh` to rebuild with the correct UID/GID.
+
 ## First-time setup
+
+On the host:
 
 ```bash
 bash scripts/docker_build.sh
+bash scripts/clone_repos.sh
 bash scripts/docker_shell.sh
 ```
 
@@ -30,7 +52,6 @@ Inside the container:
 ```bash
 source /opt/ros/jazzy/setup.bash
 bash scripts/check_environment.sh
-bash scripts/clone_repos.sh
 bash scripts/setup_workspace.sh
 ```
 
@@ -76,14 +97,33 @@ X server setup (e.g. XQuartz or VcXsrv).
 
 ## Hardware access
 
-For USB devices such as Gello or motor controllers:
+By default, `docker-compose.yml` already gives the container broad
+sensor/device access:
 
-1. Check the device on the host:
+- `/dev:/dev` — the whole host `/dev` tree is bind-mounted in, so
+  cameras, serial adapters, and other sensors attached to the host are
+  visible inside the container without extra configuration.
+- `/dev/dri:/dev/dri` and `/dev/snd:/dev/snd` — GPU render nodes (for
+  hardware-accelerated video/camera pipelines and RViz) and audio
+  devices, passed through explicitly.
+
+**This is broad access** — it is only appropriate on the lab machine that
+is actually connected to the robot. Treat it with the same care as real
+hardware: don't connect or command real robot hardware until the
+instructor confirms it's safe (see
+[docs/setup.md](setup.md#safety-warning)).
+
+For a USB device such as Gello or a motor controller:
+
+1. Check the device on the host (it should already be visible inside the
+   container too, via `/dev:/dev`):
    ```bash
    ls /dev/ttyUSB*
    ls /dev/ttyACM*
    ```
-2. Add the device to `docker-compose.yml`:
+2. If you want to scope access down to just that device instead of the
+   full `/dev:/dev` mount, add it to the `devices:` list in
+   `docker-compose.yml` and remove the `/dev:/dev` volume line:
    ```yaml
    devices:
      - /dev/ttyUSB0:/dev/ttyUSB0
@@ -96,6 +136,17 @@ For USB devices such as Gello or motor controllers:
    ```
 4. Only use `privileged: true` if the above is not enough, and only for
    real robot hardware sessions.
+
+### OpenManipulator arm (U2D2 USB-serial adapter)
+
+The arm's U2D2 USB-serial adapter needs a udev rule so it shows up with
+consistent permissions. ROBOTIS provides this in the cloned
+`open_manipulator` repo — after running `scripts/clone_repos.sh`, follow
+its own instructions to install the rule (typically
+`open_manipulator_bringup/open-manipulator-cdc.rules` plus the
+`om_create_udev_rules.py` helper script). This is not automated by this
+repository — check the arm's own README for the current steps before
+connecting it.
 
 ## ROS 2 networking
 

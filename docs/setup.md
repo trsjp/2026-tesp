@@ -3,24 +3,26 @@
 ## Recommended path for students: Docker
 
 1. Install Docker (and the Docker Compose plugin).
-2. Build the image:
+2. Build the image (matches the container's `ros` user to your host
+   UID/GID automatically):
    ```bash
    bash scripts/docker_build.sh
    ```
-3. Enter the container:
+3. Add repository URLs:
+   edit `scripts/clone_repos.sh` (see
+   [docs/repository_sources.md](repository_sources.md)).
+4. Clone external repos — **on the host**, before starting the container:
+   ```bash
+   bash scripts/clone_repos.sh
+   ```
+5. Enter the container (the repos cloned above are already visible at
+   `/workspace/ros2_ws/src` thanks to the bind mount):
    ```bash
    bash scripts/docker_shell.sh
    ```
-4. Check the environment:
+6. Check the environment:
    ```bash
    bash scripts/check_environment.sh
-   ```
-5. Add repository URLs:
-   edit `scripts/clone_repos.sh` (see
-   [docs/repository_sources.md](repository_sources.md)).
-6. Clone external repos:
-   ```bash
-   bash scripts/clone_repos.sh
    ```
 7. Build the workspace:
    ```bash
