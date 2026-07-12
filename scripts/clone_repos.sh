@@ -16,13 +16,15 @@ SRC_DIR="ros2_ws/src"
 mkdir -p "$SRC_DIR"
 
 # --- iCart mini (mobile base) ------------------------------------------
-# Intentionally left as TODO: the upstream repo (open-rdc/icart) has no
-# ROS 2 branch at all — every branch is ROS1/catkin (confirmed by
-# checking all branches). There is an unofficial, unmaintained community
-# ROS2 port (haruyama8940/icart_mini_driver_ros2, last updated 2023,
-# untested on Jazzy, missing description/gazebo packages) — see
-# docs/repository_sources.md if the instructor wants to evaluate it.
-ICART_MINI_REPO_URL="TODO"
+# CRG-Tohoku/icart-ros2 (branch worktree-ros2-jazzy-migration) is an
+# instructor-authored ROS 2 Jazzy migration of open-rdc/icart. It is a
+# single repo containing 6 colcon packages (icart_mini,
+# icart_mini_description, icart_mini_control, icart_mini_driver,
+# icart_mini_gazebo, icart_mini_setup) plus the ypspur_ros2 git
+# submodule — colcon discovers all 6 packages recursively once cloned.
+# See docs/repository_sources.md for the full breakdown and the Docker
+# build-time system deps (yp-spur, Gazebo) this repo requires.
+ICART_ROS2_REPO_URL="https://github.com/CRG-Tohoku/icart-ros2.git"
 
 # --- Gello (lead-arm teleoperation controller) --------------------------
 # Standalone Python project (installed with `uv`/pip), not a colcon/ROS
@@ -48,6 +50,7 @@ clone_one() {
     local name="$1"
     local url="$2"
     local branch="${3:-}"
+    local submodules="${4:-}"
     local target="$SRC_DIR/$name"
 
     if [[ "$url" == *TODO* ]]; then
@@ -62,16 +65,15 @@ clone_one() {
         return
     fi
 
-    if [ -n "$branch" ]; then
-        echo "Cloning $name (branch: $branch) into $target ..."
-        git clone -b "$branch" "$url" "$target"
-    else
-        echo "Cloning $name into $target ..."
-        git clone "$url" "$target"
-    fi
+    local clone_args=()
+    [ -n "$branch" ] && clone_args+=(-b "$branch")
+    [ "$submodules" = "--recurse-submodules" ] && clone_args+=(--recurse-submodules)
+
+    echo "Cloning $name${branch:+ (branch: $branch)} into $target ..."
+    git clone "${clone_args[@]}" "$url" "$target"
 }
 
-clone_one "icart_mini" "$ICART_MINI_REPO_URL"
+clone_one "icart-ros2" "$ICART_ROS2_REPO_URL" "worktree-ros2-jazzy-migration" "--recurse-submodules"
 clone_one "gello" "$GELLO_REPO_URL"
 clone_one "open_manipulator" "$OPEN_MANIPULATOR_REPO_URL" "jazzy"
 clone_one "dynamixel_hardware_interface" "$DYNAMIXEL_HARDWARE_INTERFACE_REPO_URL" "jazzy"
