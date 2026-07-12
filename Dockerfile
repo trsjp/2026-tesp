@@ -35,17 +35,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libusb-1.0-0-dev \
     # ^ libusb-1.0-0-dev: needed by DynamixelSDK for USB-serial (U2D2)
     #   access when building the OpenManipulator arm packages from source.
+    libboost-all-dev \
+    # ^ libboost-all-dev: needed by ypspur_ros2's CMake
+    #   (find_package(Boost ... chrono thread atomic)) — see
+    #   docs/repository_sources.md.
     && rm -rf /var/lib/apt/lists/*
 
-# ---------------------------------------------------------------------------
-# ROS 2 packages used by this project (Nav2, MoveIt, teleop, visualization)
-#
-# These are installed with apt-get so a missing package fails the build
-# loudly rather than silently producing a broken environment. If a package
-# in this list is unavailable for the current ROS distro/architecture,
-# remove it from the list below and note it in docs/troubleshooting.md
-# instead of leaving the Docker build fragile.
-# ---------------------------------------------------------------------------
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-jazzy-navigation2 \
     ros-jazzy-nav2-bringup \
@@ -61,7 +56,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # ros2-control/ros2-controllers above are needed by the OpenManipulator
-# arm's dynamixel_hardware_interface package (a ros2_control plugin).
+# arm's dynamixel_hardware_interface package (a ros2_control plugin), and
+# by iCart mini's icart_mini_control/icart_mini_gazebo packages.
 #
 # The OpenManipulator-family source packages themselves — DynamixelSDK,
 # dynamixel_interfaces, dynamixel_hardware_interface, and their further
@@ -72,15 +68,45 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Docker workflow (avoids guessing apt package names/versions).
 #
 # Optional/out of scope for the default setup, not installed here:
-# - Gazebo simulation support (ros-jazzy-ros-gz-*, ros-jazzy-gz-ros2-control)
 # - RealSense camera support (ros-jazzy-realsense2-description, libglfw3-dev)
-# If a class needs either, add them here and document why.
+# If a class needs it, add it here and document why.
 
 # Optional package, not installed by default because availability varies by
 # platform/architecture: ros-jazzy-tf-transformations
 # If you need it, try installing it manually inside the container with:
 #   sudo apt-get update && sudo apt-get install -y ros-jazzy-tf-transformations
 # or install it via pip: pip3 install --user tf-transformations
+
+# ---------------------------------------------------------------------------
+# iCart mini (mobile base) dependencies — CRG-Tohoku/icart-ros2, see
+# docs/repository_sources.md. Includes Gazebo simulation support
+# (icart_mini_gazebo), previously out of scope for this image.
+# ---------------------------------------------------------------------------
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-jazzy-ros-gz \
+    ros-jazzy-gz-ros2-control \
+    ros-jazzy-controller-manager \
+    ros-jazzy-teleop-twist-joy \
+    ros-jazzy-joy \
+    ros-jazzy-urg-node \
+    ros-jazzy-launch-testing \
+    ros-jazzy-launch-testing-ament-cmake \
+    liburdfdom-tools \
+    python3-pytest \
+    && rm -rf /var/lib/apt/lists/*
+
+# ---------------------------------------------------------------------------
+# yp-spur: non-ROS C library required by ypspur_ros2's CMake
+# (find_package(ypspur 1.20.0 REQUIRED)) — not resolvable by rosdep.
+# Built from source here, mirroring CRG-Tohoku/icart-ros2's own Dockerfile.
+# ---------------------------------------------------------------------------
+RUN git clone --depth 1 https://github.com/openspur/yp-spur.git /tmp/yp-spur \
+    && cd /tmp/yp-spur \
+    && ./configure \
+    && make \
+    && make install \
+    && ldconfig \
+    && rm -rf /tmp/yp-spur
 
 # ---------------------------------------------------------------------------
 # Non-root user
