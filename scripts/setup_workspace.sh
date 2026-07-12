@@ -15,11 +15,14 @@ fi
 
 cd ros2_ws
 
+echo "Updating rosdep database..."
+rosdep update
+
 echo "Installing dependencies with rosdep..."
-rosdep install --from-paths src --ignore-src -r -y
+rosdep install --from-paths src --ignore-src -r -y || echo "WARNING: some rosdep packages could not be installed (some may not be available in this distro version)"
 
 echo "Building workspace with colcon..."
-colcon build --symlink-install
+colcon build --symlink-install --continue-on-error
 
 echo ""
 echo "Build finished. Source the workspace with:"

@@ -77,8 +77,9 @@ Inside the container:
 
 ```bash
 cd /workspace/ros2_ws
+rosdep update
 rosdep install --from-paths src --ignore-src -r -y
-colcon build --symlink-install
+colcon build --symlink-install --continue-on-error
 source install/setup.bash
 ```
 
