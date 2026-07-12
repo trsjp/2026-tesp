@@ -2,8 +2,7 @@
 
 External robot repositories are cloned into `ros2_ws/src` by
 `scripts/clone_repos.sh`. This page records what was checked upstream for
-each component and why each URL/branch was chosen (or, for iCart, why it
-is intentionally left as a TODO).
+each component and why each URL/branch was chosen.
 
 | Component | Purpose | Target folder | Upstream URL | Notes |
 |---|---|---|---|---|
