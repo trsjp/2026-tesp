@@ -41,6 +41,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     #   docs/repository_sources.md.
     && rm -rf /var/lib/apt/lists/*
 
+# ---------------------------------------------------------------------------
+# ROS 2 packages used by this project (Nav2, MoveIt, teleop, visualization)
+#
+# These are installed with apt-get so a missing package fails the build
+# loudly rather than silently producing a broken environment. If a package
+# in this list is unavailable for the current ROS distro/architecture,
+# remove it from the list below and note it in docs/troubleshooting.md
+# instead of leaving the Docker build fragile.
+# ---------------------------------------------------------------------------
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-jazzy-navigation2 \
     ros-jazzy-nav2-bringup \
