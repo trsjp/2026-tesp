@@ -148,6 +148,18 @@ its own instructions to install the rule (typically
 repository — check the arm's own README for the current steps before
 connecting it.
 
+### iCart mini (URG lidar + joystick)
+
+`icart_mini_driver` (real hardware) depends on a URG lidar (`urg_node`)
+and joystick teleop (`joy`, `teleop_twist_joy`) in addition to the
+YP-Spur motor-controller bridge (`ypspur_ros2`). Like the OpenManipulator
+arm, these are real-hardware components: don't launch `icart_mini_driver`
+until the instructor confirms it's safe (see
+[docs/setup.md](setup.md#safety-warning)). `icart_mini_setup` (cloned
+alongside the driver) has scripts to generate the udev rules and
+parameter files these depend on — see its README under
+`ros2_ws/src/icart-ros2/icart_mini_setup`.
+
 ## ROS 2 networking
 
 - ROS 2 uses DDS for discovery between nodes.
