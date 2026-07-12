@@ -22,7 +22,7 @@ echo "Installing dependencies with rosdep..."
 rosdep install --from-paths src --ignore-src -r -y || echo "WARNING: some rosdep packages could not be installed (some may not be available in this distro version)"
 
 echo "Building workspace with colcon..."
-colcon build --symlink-install --continue-on-error
+colcon build --symlink-install --continue-on-error || echo "WARNING: one or more packages failed to build — check the colcon summary above for which ones."
 
 echo ""
 echo "Build finished. Source the workspace with:"
