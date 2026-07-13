@@ -67,8 +67,17 @@ several robot arms this project doesn't use (UR, xArm, Franka), a
 Pinocchio pin, and expects Python 3.11. Because of this:
 
 - `clone_repos.sh` clones it into `ros2_ws/src/gello` for reference/
-  source, but `scripts/setup_workspace.sh`'s `colcon build` will simply
-  skip it (there's no `package.xml` at its root).
+  source. It has no `package.xml`, but colcon's generic Python package
+  identification still picks up its bare `setup.py` and tries to build
+  it — which fails under `colcon build --symlink-install` specifically:
+  symlink-install only symlinks `setup.py` and the top-level `gello/`
+  package directory into `ros2_ws/build/gello/`, not the rest of the
+  source tree, and `gello_software`'s `setup.py` reads `README.md` via a
+  bare relative path (`open("README.md")`), which no longer resolves
+  once only those two paths are symlinked in. `clone_repos.sh` places a
+  `COLCON_IGNORE` marker file in `ros2_ws/src/gello/` right after
+  cloning — colcon's standard mechanism for excluding a directory from
+  package discovery entirely — so it's never attempted.
 - Its Python environment is **not** set up by any script in this repo —
   follow `gello_software`'s own README (`uv venv --python 3.11`, `git
   submodule update --init`, etc.) manually once you know which of its

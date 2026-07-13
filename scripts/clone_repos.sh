@@ -28,8 +28,10 @@ ICART_ROS2_REPO_URL="https://github.com/CRG-Tohoku/icart-ros2.git"
 
 # --- Gello (lead-arm teleoperation controller) --------------------------
 # Standalone Python project (installed with `uv`/pip), not a colcon/ROS
-# package at the top level — `setup_workspace.sh`'s colcon build will
-# simply skip this folder (no package.xml at its root). Its Python
+# package — despite having no package.xml, colcon's generic Python
+# package identification still picks up its bare setup.py and tries to
+# build it, which fails under --symlink-install (see COLCON_IGNORE
+# marker below and docs/repository_sources.md for why). Its Python
 # environment (Python 3.11 via `uv`) must be set up separately, following
 # gello_software's own README. See docs/repository_sources.md.
 GELLO_REPO_URL="https://github.com/wuphilipp/gello_software.git"
@@ -51,6 +53,7 @@ clone_one() {
     local url="$2"
     local branch="${3:-}"
     local submodules="${4:-}"
+    local colcon_ignore="${5:-}"
     local target="$SRC_DIR/$name"
 
     if [[ "$url" == *TODO* ]]; then
@@ -62,19 +65,25 @@ clone_one() {
 
     if [ -d "$target" ]; then
         echo "SKIP: $name — $target already exists."
-        return
+    else
+        local clone_args=()
+        [ -n "$branch" ] && clone_args+=(-b "$branch")
+        [ "$submodules" = "--recurse-submodules" ] && clone_args+=(--recurse-submodules)
+
+        echo "Cloning $name${branch:+ (branch: $branch)} into $target ..."
+        git clone "${clone_args[@]}" "$url" "$target"
     fi
 
-    local clone_args=()
-    [ -n "$branch" ] && clone_args+=(-b "$branch")
-    [ "$submodules" = "--recurse-submodules" ] && clone_args+=(--recurse-submodules)
-
-    echo "Cloning $name${branch:+ (branch: $branch)} into $target ..."
-    git clone "${clone_args[@]}" "$url" "$target"
+    if [ "$colcon_ignore" = "--colcon-ignore" ]; then
+        # Tells colcon to never treat this directory as a package to
+        # build (colcon's standard mechanism — see docs/repository_sources.md
+        # for why this is needed even though there's no package.xml here).
+        touch "$target/COLCON_IGNORE"
+    fi
 }
 
 clone_one "icart-ros2" "$ICART_ROS2_REPO_URL" "worktree-ros2-jazzy-migration" "--recurse-submodules"
-clone_one "gello" "$GELLO_REPO_URL"
+clone_one "gello" "$GELLO_REPO_URL" "" "" "--colcon-ignore"
 clone_one "open_manipulator" "$OPEN_MANIPULATOR_REPO_URL" "jazzy"
 clone_one "dynamixel_hardware_interface" "$DYNAMIXEL_HARDWARE_INTERFACE_REPO_URL" "jazzy"
 clone_one "dynamixel_interfaces" "$DYNAMIXEL_INTERFACES_REPO_URL" "jazzy"
