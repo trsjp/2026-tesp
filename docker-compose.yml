@@ -54,11 +54,31 @@ services:
     # Uncomment and edit only when connecting to real robot hardware, and
     # only after the instructor has confirmed it is safe to do so.
     #
-    # Add extra entries to the `devices:` list above, e.g.:
-    #   - /dev/ttyUSB0:/dev/ttyUSB0
-    #
-    # group_add:
-    #   - dialout
-    #
-    # privileged: true
+    # The whole /dev tree is bind-mounted above (with privileged: true
+    # here) instead of listing individual device paths. This avoids hard
+    # failures when a specific device (e.g. /dev/ttyUSB0) isn't present
+    # yet, and means swapping to a different robot arm/USB serial device
+    # doesn't require editing this file - whatever is currently attached
+    # to the host (or, on Docker Desktop/WSL2, attached via
+    # `usbipd attach --wsl`) just shows up inside the container.
+    privileged: true
+
+    # privileged: true grants capabilities (e.g. CAP_SYS_NICE) but does NOT
+    # raise resource ulimits. rtprio defaults to 0, which blocks
+    # ros2_control's controller_manager from getting SCHED_FIFO priority
+    # for its real-time control loop ("Could not enable FIFO RT scheduling
+    # policy: Operation not permitted"). Without RT priority, the control
+    # loop can starve the executor thread that answers controller_manager
+    # service calls (list_controllers, load_controller, ...), causing
+    # spawner nodes to time out with "Failed to acquire lock".
+    ulimits:
+      rtprio: 99
+      memlock: -1
+
+    group_add:
+      - dialout
+      # Owns /dev/input/event* under WSL2 (group name for this GID varies by
+      # host; on this setup it's "render", not the more usual "input").
+      # Needed for joy_node's SDL2 backend to open the gamepad's evdev node.
+      - render
     # -------------------------------------------------------------------
