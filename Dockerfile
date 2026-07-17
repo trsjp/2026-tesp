@@ -54,12 +54,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-jazzy-navigation2 \
     ros-jazzy-nav2-bringup \
     ros-jazzy-moveit \
+    ros-jazzy-moveit-py \
     ros-jazzy-xacro \
     ros-jazzy-joint-state-publisher \
     ros-jazzy-joint-state-publisher-gui \
     ros-jazzy-robot-state-publisher \
     ros-jazzy-rviz2 \
     ros-jazzy-teleop-twist-keyboard \
+    ros-jazzy-joy \
     ros-jazzy-ros2-control \
     ros-jazzy-ros2-controllers \
     && rm -rf /var/lib/apt/lists/*
