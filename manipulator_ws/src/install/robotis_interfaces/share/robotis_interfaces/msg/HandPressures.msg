@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/robotis_interfaces/msg/HandPressures.msg

@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/robotis_interfaces/rosidl_typesupport_introspection_cpp/robotis_interfaces/msg/detail/move_l__rosidl_typesupport_introspection_cpp.hpp

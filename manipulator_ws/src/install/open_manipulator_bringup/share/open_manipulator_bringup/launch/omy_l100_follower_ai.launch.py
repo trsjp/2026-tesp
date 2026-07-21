@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/open_manipulator_bringup/launch/omy_l100_follower_ai.launch.py

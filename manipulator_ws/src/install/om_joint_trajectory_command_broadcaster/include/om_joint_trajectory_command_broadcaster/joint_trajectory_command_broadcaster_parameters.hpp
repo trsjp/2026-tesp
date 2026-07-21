@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/om_joint_trajectory_command_broadcaster/include/om_joint_trajectory_command_broadcaster/joint_trajectory_command_broadcaster_parameters.hpp

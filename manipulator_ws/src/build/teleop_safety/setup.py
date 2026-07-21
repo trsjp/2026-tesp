@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/teleop_safety/setup.py

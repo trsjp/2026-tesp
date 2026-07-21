@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/open_manipulator_bringup/launch/open_manipulator_x_gazebo.launch.py

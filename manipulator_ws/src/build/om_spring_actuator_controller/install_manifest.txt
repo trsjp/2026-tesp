@@ -1,3 +1,0 @@
-/workspace/manipulator_ws/src/install/om_spring_actuator_controller/lib/libspring_actuator_controller.so
-/workspace/manipulator_ws/src/install/om_spring_actuator_controller/share/om_spring_actuator_controller/cmake/export_spring_actuator_controllerExport.cmake
-/workspace/manipulator_ws/src/install/om_spring_actuator_controller/share/om_spring_actuator_controller/cmake/export_spring_actuator_controllerExport-noconfig.cmake

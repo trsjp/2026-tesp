@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/dynamixel_interfaces/rosidl_generator_c/dynamixel_interfaces/msg/detail/dynamixel_state__type_support.h

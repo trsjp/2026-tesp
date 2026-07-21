@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/open_manipulator_moveit_config/ament_cmake_environment_hooks/local_setup.bash

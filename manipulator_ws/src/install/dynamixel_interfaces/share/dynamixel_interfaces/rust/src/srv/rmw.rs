@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/dynamixel_interfaces/rosidl_generator_rs/dynamixel_interfaces/rust/src/srv/rmw.rs

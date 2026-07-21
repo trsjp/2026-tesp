@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/robotis_interfaces/ament_cmake_core/robotis_interfacesConfig-version.cmake

@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/robotis_interfaces/rosidl_typesupport_introspection_c/robotis_interfaces/msg/detail/tactile_sensor__rosidl_typesupport_introspection_c.h

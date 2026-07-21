@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/open_manipulator/open_manipulator_bringup/launch/omy_l100_leader_ai.launch.py

@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/om_spring_actuator_controller/ament_cmake_core/om_spring_actuator_controllerConfig.cmake

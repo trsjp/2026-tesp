@@ -1,5 +1,0 @@
--I/workspace/manipulator_ws/src/open_manipulator/open_manipulator_gui
--I/workspace/manipulator_ws/src/build/open_manipulator_gui
--o
-/workspace/manipulator_ws/src/build/open_manipulator_gui/include/omx_f_gui/moc_main_window.cpp
-/workspace/manipulator_ws/src/open_manipulator/open_manipulator_gui/include/omx_f_gui/main_window.hpp

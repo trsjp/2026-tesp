@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/om_joint_trajectory_command_broadcaster/ament_cmake_environment_hooks/local_setup.sh

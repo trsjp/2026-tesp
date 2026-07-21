@@ -1,4 +1,0 @@
-/workspace/manipulator_ws/src/build/robotis_interfaces/rosidl_adapter/robotis_interfaces:msg/HandJoints.idl
-/workspace/manipulator_ws/src/build/robotis_interfaces/rosidl_adapter/robotis_interfaces:msg/HandPressures.idl
-/workspace/manipulator_ws/src/build/robotis_interfaces/rosidl_adapter/robotis_interfaces:msg/MoveL.idl
-/workspace/manipulator_ws/src/build/robotis_interfaces/rosidl_adapter/robotis_interfaces:msg/TactileSensor.idl

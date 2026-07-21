@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/dynamixel_interfaces/rosidl_typesupport_introspection_c/dynamixel_interfaces/srv/detail/reboot_dxl__rosidl_typesupport_introspection_c.h

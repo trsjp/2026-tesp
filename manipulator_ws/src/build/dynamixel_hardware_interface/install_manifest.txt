@@ -1,3 +1,0 @@
-/workspace/manipulator_ws/src/install/dynamixel_hardware_interface/lib/libdynamixel_hardware_interface.so
-/workspace/manipulator_ws/src/install/dynamixel_hardware_interface/share/dynamixel_hardware_interface/cmake/export_dynamixel_hardware_interfaceExport.cmake
-/workspace/manipulator_ws/src/install/dynamixel_hardware_interface/share/dynamixel_hardware_interface/cmake/export_dynamixel_hardware_interfaceExport-noconfig.cmake

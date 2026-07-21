@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/dynamixel_hardware_interface/scripts/check_model_file_formatting.py

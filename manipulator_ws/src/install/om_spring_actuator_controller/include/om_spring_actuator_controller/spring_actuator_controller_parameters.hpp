@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/om_spring_actuator_controller/include/om_spring_actuator_controller/spring_actuator_controller_parameters.hpp

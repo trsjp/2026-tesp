@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/open_manipulator_bringup/launch/omx_f_follower_ai.launch.py

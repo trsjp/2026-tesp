@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/robotis_interfaces/rosidl_generator_rs/robotis_interfaces/rust/src/lib.rs

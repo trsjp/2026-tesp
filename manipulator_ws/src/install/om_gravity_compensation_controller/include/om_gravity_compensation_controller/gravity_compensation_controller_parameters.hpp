@@ -1,1 +1,0 @@
-/workspace/manipulator_ws/src/build/om_gravity_compensation_controller/include/om_gravity_compensation_controller/gravity_compensation_controller_parameters.hpp
