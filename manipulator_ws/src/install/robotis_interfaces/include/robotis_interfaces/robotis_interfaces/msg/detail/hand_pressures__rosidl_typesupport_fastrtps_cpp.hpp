@@ -1,0 +1,1 @@
+/workspace/manipulator_ws/src/build/robotis_interfaces/rosidl_typesupport_fastrtps_cpp/robotis_interfaces/msg/detail/hand_pressures__rosidl_typesupport_fastrtps_cpp.hpp

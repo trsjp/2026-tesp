@@ -1,0 +1,1 @@
+/workspace/manipulator_ws/src/build/open_manipulator_gui/ament_cmake_core/open_manipulator_guiConfig-version.cmake

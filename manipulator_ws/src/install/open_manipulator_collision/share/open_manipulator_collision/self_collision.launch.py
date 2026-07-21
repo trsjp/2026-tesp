@@ -1,0 +1,1 @@
+/workspace/manipulator_ws/src/open_manipulator/open_manipulator_collision/launch/self_collision.launch.py

@@ -1,0 +1,1 @@
+/workspace/manipulator_ws/src/build/dynamixel_interfaces/rosidl_generator_c/dynamixel_interfaces/srv/reboot_dxl.h

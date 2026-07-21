@@ -1,0 +1,1 @@
+/workspace/manipulator_ws/src/build/dynamixel_interfaces/rosidl_generator_c/dynamixel_interfaces/srv/detail/get_data_from_dxl__type_support.h

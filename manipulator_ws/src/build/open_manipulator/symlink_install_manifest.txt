@@ -1,0 +1,15 @@
+/workspace/manipulator_ws/src/install/open_manipulator/share/ament_index/resource_index/package_run_dependencies/open_manipulator
+/workspace/manipulator_ws/src/install/open_manipulator/share/ament_index/resource_index/parent_prefix_path/open_manipulator
+/workspace/manipulator_ws/src/install/open_manipulator/share/open_manipulator/environment/ament_prefix_path.sh
+/workspace/manipulator_ws/src/install/open_manipulator/share/open_manipulator/environment/ament_prefix_path.dsv
+/workspace/manipulator_ws/src/install/open_manipulator/share/open_manipulator/environment/path.sh
+/workspace/manipulator_ws/src/install/open_manipulator/share/open_manipulator/environment/path.dsv
+/workspace/manipulator_ws/src/install/open_manipulator/share/open_manipulator/local_setup.bash
+/workspace/manipulator_ws/src/install/open_manipulator/share/open_manipulator/local_setup.sh
+/workspace/manipulator_ws/src/install/open_manipulator/share/open_manipulator/local_setup.zsh
+/workspace/manipulator_ws/src/install/open_manipulator/share/open_manipulator/local_setup.dsv
+/workspace/manipulator_ws/src/install/open_manipulator/share/open_manipulator/package.dsv
+/workspace/manipulator_ws/src/install/open_manipulator/share/ament_index/resource_index/packages/open_manipulator
+/workspace/manipulator_ws/src/install/open_manipulator/share/open_manipulator/cmake/open_manipulatorConfig.cmake
+/workspace/manipulator_ws/src/install/open_manipulator/share/open_manipulator/cmake/open_manipulatorConfig-version.cmake
+/workspace/manipulator_ws/src/install/open_manipulator/share/open_manipulator/package.xml

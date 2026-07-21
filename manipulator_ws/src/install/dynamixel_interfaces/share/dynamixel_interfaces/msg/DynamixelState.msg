@@ -1,0 +1,1 @@
+/workspace/manipulator_ws/src/dynamixel_interfaces/msg/DynamixelState.msg

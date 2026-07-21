@@ -1,0 +1,1 @@
+/workspace/manipulator_ws/src/build/dynamixel_interfaces/ament_cmake_core/dynamixel_interfacesConfig-version.cmake

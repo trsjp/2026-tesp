@@ -1,0 +1,5 @@
+[console_scripts]
+listener = henry_test.subscriber_member_function:main
+moveit_py_mover = henry_test.moveit_py_random_mover:main
+moveit_py_teleop = henry_test.moveit_py_joystick_teleop:main
+mover = henry_test.random_mover:main

@@ -1,0 +1,1 @@
+/workspace/manipulator_ws/src/build/robotis_interfaces/rosidl_generator_c/robotis_interfaces/msg/tactile_sensor.h

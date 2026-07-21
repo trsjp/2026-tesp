@@ -1,0 +1,1 @@
+/workspace/manipulator_ws/src/open_manipulator/open_manipulator_collision/include/open_manipulator_collision/self_collision_node.hpp

@@ -1,0 +1,1 @@
+/workspace/manipulator_ws/src/open_manipulator/open_manipulator_bringup/launch/camera_usb_cam.launch.py

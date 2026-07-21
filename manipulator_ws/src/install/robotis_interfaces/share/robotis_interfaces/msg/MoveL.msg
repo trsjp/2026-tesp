@@ -1,0 +1,1 @@
+/workspace/manipulator_ws/src/robotis_interfaces/msg/MoveL.msg

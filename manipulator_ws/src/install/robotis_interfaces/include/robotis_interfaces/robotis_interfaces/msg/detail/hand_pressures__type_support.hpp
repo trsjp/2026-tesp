@@ -1,0 +1,1 @@
+/workspace/manipulator_ws/src/build/robotis_interfaces/rosidl_generator_cpp/robotis_interfaces/msg/detail/hand_pressures__type_support.hpp

@@ -1,0 +1,1 @@
+/workspace/manipulator_ws/src/open_manipulator/open_manipulator_moveit_config/launch/omy_f3m_moveit.launch.py

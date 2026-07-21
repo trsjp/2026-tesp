@@ -1,0 +1,1 @@
+/workspace/manipulator_ws/src/build/robotis_interfaces/rosidl_generator_c/robotis_interfaces/msg/detail/hand_joints__functions.h

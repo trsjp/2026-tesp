@@ -1,0 +1,4 @@
+/workspace/manipulator_ws/src/build/dynamixel_interfaces/rosidl_adapter/dynamixel_interfaces:msg/DynamixelState.idl
+/workspace/manipulator_ws/src/build/dynamixel_interfaces/rosidl_adapter/dynamixel_interfaces:srv/GetDataFromDxl.idl
+/workspace/manipulator_ws/src/build/dynamixel_interfaces/rosidl_adapter/dynamixel_interfaces:srv/SetDataToDxl.idl
+/workspace/manipulator_ws/src/build/dynamixel_interfaces/rosidl_adapter/dynamixel_interfaces:srv/RebootDxl.idl
