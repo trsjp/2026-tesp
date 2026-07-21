@@ -10,3 +10,6 @@
 [submodule "ros2_ws/gello_software"]
 	path = ros2_ws/gello_software
 	url = https://github.com/wuphilipp/gello_software
+[submodule "ros2_ws/src/realsense-ros"]
+	path = ros2_ws/src/realsense-ros
+	url = https://github.com/IntelRealSense/realsense-ros
