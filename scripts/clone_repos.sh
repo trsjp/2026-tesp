@@ -47,6 +47,7 @@ OPEN_MANIPULATOR_REPO_URL="https://github.com/ROBOTIS-GIT/open_manipulator.git"
 DYNAMIXEL_HARDWARE_INTERFACE_REPO_URL="https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface.git"
 DYNAMIXEL_INTERFACES_REPO_URL="https://github.com/ROBOTIS-GIT/dynamixel_interfaces.git"
 DYNAMIXEL_SDK_REPO_URL="https://github.com/ROBOTIS-GIT/DynamixelSDK.git"
+ROBOTIS_INTERFACES_REPO_URL="https://github.com/ROBOTIS-GIT/robotis_interfaces.git"
 
 clone_one() {
     local name="$1"
@@ -88,6 +89,7 @@ clone_one "open_manipulator" "$OPEN_MANIPULATOR_REPO_URL" "jazzy"
 clone_one "dynamixel_hardware_interface" "$DYNAMIXEL_HARDWARE_INTERFACE_REPO_URL" "jazzy"
 clone_one "dynamixel_interfaces" "$DYNAMIXEL_INTERFACES_REPO_URL" "jazzy"
 clone_one "DynamixelSDK" "$DYNAMIXEL_SDK_REPO_URL" "jazzy"
+clone_one "robotis_interfaces" "$ROBOTIS_INTERFACES_REPO_URL" "jazzy"
 
 echo ""
 echo "Done. Any 'SKIP' above means a repository URL still needs to be added."

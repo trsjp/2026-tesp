@@ -12,6 +12,7 @@ each component and why each URL/branch was chosen.
 | — companion: dynamixel_hardware_interface | `ros2_control` hardware interface plugin for the arm | `ros2_ws/src/dynamixel_hardware_interface` | https://github.com/ROBOTIS-GIT/dynamixel_hardware_interface (branch: `jazzy`) | Required by OpenManipulator. Built from source via colcon. |
 | — companion: dynamixel_interfaces | Custom msg/srv interfaces for Dynamixel actuators | `ros2_ws/src/dynamixel_interfaces` | https://github.com/ROBOTIS-GIT/dynamixel_interfaces (branch: `jazzy`) | Required by OpenManipulator. Built from source via colcon. |
 | — companion: DynamixelSDK | Dynamixel actuator SDK | `ros2_ws/src/DynamixelSDK` | https://github.com/ROBOTIS-GIT/DynamixelSDK (branch: `jazzy`) | Required by OpenManipulator. Built from source via colcon. |
+| — companion: robotis_interfaces | Custom msg/srv interfaces for ROBOTIS's Physical AI lineup | `ros2_ws/src/robotis_interfaces` | https://github.com/ROBOTIS-GIT/robotis_interfaces (branch: `jazzy`) | Required by `open_manipulator_playground`. Confirmed via ROBOTIS's own `open_manipulator/docker/Dockerfile`, which clones it alongside the other 3 companions and passes `--skip-keys robotis_interfaces` to `rosdep install`. Built from source via colcon. |
 
 ## iCart mini: ROS 2 Jazzy migration (CRG-Tohoku fork)
 
