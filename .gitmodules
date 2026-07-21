@@ -7,3 +7,6 @@
 [submodule "ros2_ws/src/ros_aruco_opencv"]
 	path = ros2_ws/src/ros_aruco_opencv
 	url = https://github.com/fictionlab/ros_aruco_opencv
+[submodule "ros2_ws/gello_software"]
+	path = ros2_ws/gello_software
+	url = https://github.com/wuphilipp/gello_software
