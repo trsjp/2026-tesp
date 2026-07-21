@@ -172,6 +172,15 @@ class JoystickTeleopMover(Node):
             self, FollowJointTrajectory, '/arm_controller/follow_joint_trajectory')
         self.gripper_action_client = ActionClient(
             self, GripperCommand, '/gripper_controller/gripper_cmd')
+        # Jogging publishes straight to the controller's command topic instead of
+        # going through the action interface: the control loop sends a new
+        # trajectory every tick (80 Hz), and hammering FollowJointTrajectory with a
+        # fresh goal that fast has been observed to crash ros2_control_node with
+        # heap corruption (goal churn in the action server isn't meant for
+        # streaming at control-loop rate). The action client above is kept only
+        # for the infrequent reset-to-rest-pose goal.
+        self.trajectory_pub = self.create_publisher(
+            JointTrajectory, '/arm_controller/joint_trajectory', 10)
         self.create_subscription(Joy, '/joy', self._joy_callback, 10)
         self.create_timer(1.0 / CONTROL_RATE_HZ, self._control_loop)
 
@@ -226,7 +235,7 @@ class JoystickTeleopMover(Node):
                 throttle_duration_sec=1.0)
             return
 
-        self._send_trajectory(self.robot_state.get_joint_group_positions('arm'))
+        self._publish_jog_trajectory(self.robot_state.get_joint_group_positions('arm'))
 
     def _update_gripper(self, joy):
         press_amount = trigger_press_amount(joy.axes[R2_AXIS])
@@ -267,10 +276,7 @@ class JoystickTeleopMover(Node):
         ]
         self._filtered_axes = [0.0, 0.0, 0.0]
 
-    def _send_trajectory(self, joint_positions, duration_s=TRAJECTORY_TIME_S):
-        if not self.action_client.server_is_ready():
-            return False
-
+    def _build_trajectory(self, joint_positions, duration_s):
         point = JointTrajectoryPoint()
         point.positions = list(joint_positions)
         point.time_from_start.sec = int(duration_s)
@@ -279,9 +285,17 @@ class JoystickTeleopMover(Node):
         trajectory = JointTrajectory()
         trajectory.joint_names = JOINT_NAMES
         trajectory.points = [point]
+        return trajectory
+
+    def _publish_jog_trajectory(self, joint_positions, duration_s=TRAJECTORY_TIME_S):
+        self.trajectory_pub.publish(self._build_trajectory(joint_positions, duration_s))
+
+    def _send_trajectory(self, joint_positions, duration_s=TRAJECTORY_TIME_S):
+        if not self.action_client.server_is_ready():
+            return False
 
         goal_msg = FollowJointTrajectory.Goal()
-        goal_msg.trajectory = trajectory
+        goal_msg.trajectory = self._build_trajectory(joint_positions, duration_s)
         self.action_client.send_goal_async(goal_msg)
         return True
 
