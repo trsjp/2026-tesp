@@ -4,6 +4,9 @@
 [submodule "ros2_ws/src/yolo_ros"]
 	path = ros2_ws/src/yolo_ros
 	url = https://github.com/mgonzs13/yolo_ros
+[submodule "ros2_ws/src/realsense-ros"]
+	path = ros2_ws/src/realsense-ros
+	url = https://github.com/realsenseai/realsense-ros
 [submodule "ros2_ws/src/ros_aruco_opencv"]
 	path = ros2_ws/src/ros_aruco_opencv
 	url = https://github.com/fictionlab/ros_aruco_opencv
