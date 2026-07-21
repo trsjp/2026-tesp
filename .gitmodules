@@ -1,3 +1,9 @@
 [submodule "ros2_ws/src/open_manipulator"]
 	path = ros2_ws/src/open_manipulator
 	url = https://github.com/robotis-git/open_manipulator
+[submodule "ros2_ws/src/yolo_ros"]
+	path = ros2_ws/src/yolo_ros
+	url = https://github.com/mgonzs13/yolo_ros
+[submodule "ros2_ws/src/ros_aruco_opencv"]
+	path = ros2_ws/src/ros_aruco_opencv
+	url = https://github.com/fictionlab/ros_aruco_opencv
