@@ -40,7 +40,7 @@ services:
       - /dev/dri:/dev/dri
       - /dev/snd:/dev/snd
     environment:
-      - ROS_DOMAIN_ID=30
+      - ROS_DOMAIN_ID=141
       - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
       # DISPLAY is forwarded so GUI tools (rviz2, rqt) can render on the
       # host's X server. On Linux, run `xhost +local:docker` on the host

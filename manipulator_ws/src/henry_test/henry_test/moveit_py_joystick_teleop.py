@@ -17,7 +17,8 @@
 # ros2_control bringup (arm_controller + gripper_controller) to be up.
 #
 # Controls:
-#   left stick (x/y)   -> horizontal (X/Y) jog
+#   left stick (x)      -> rotate target about the base (Z axis, yaw)
+#   left stick (y)      -> radial (in/out from the base) jog
 #   right stick (y)     -> vertical (Z) jog
 #   right trigger (R2)  -> close the gripper (proportional to how far it's
 #                          pressed); released == open
@@ -45,6 +46,7 @@
 # and watch which index moves as you work each stick/trigger/button; adjust
 # the constants below if they don't match.
 
+import math
 import os
 import time
 from pathlib import Path
@@ -69,8 +71,10 @@ RIGHT_STICK_Y_AXIS = 4
 R2_AXIS = 5  # analog trigger: SDL2 rests at +1.0 (released), -1.0 (fully pressed)
 CIRCLE_BUTTON = 2  # PS4 "circle" face button (measured via `ros2 topic echo /joy`)
 
-# Push left stick forward (-Y in SDL convention) drives +X (away from the base).
+# Push left stick forward (-Y in SDL convention) drives the target radially
+# outward (away from the base).
 # Push right stick up (-Y in SDL convention) drives +Z (upward).
+# Push left stick left/right (X) rotates the target about the base (+yaw).
 # Flip these to -1 if a direction feels reversed on your hardware.
 FORWARD_AXIS_SIGN = 1
 SIDE_AXIS_SIGN = -1
@@ -80,6 +84,7 @@ STICK_DEADZONE = 0.15
 CONTROL_RATE_HZ = 500.0
 LINEAR_SPEED = 0.2  # m/s at full stick deflection
 Z_SPEED = 0.3  # m/s at full right-stick deflection
+ANGULAR_SPEED = 1.5  # rad/s at full left-stick-x deflection, about the base Z axis
 IK_TIMEOUT_S = 0.05
 TRAJECTORY_TIME_S = 1.5 / CONTROL_RATE_HZ  # > control period so points overlap smoothly
 
@@ -98,9 +103,9 @@ SMOOTHING_ALPHA = 0.3
 # MoveIt's self-collision checking; min Z keeps clearance above the table).
 # Corners of the box may occasionally be outside the true (roughly circular)
 # reachable region -- IK failures there are handled by holding position.
-MIN_X, MAX_X = -0.10, 0.32
-MIN_Y, MAX_Y = -0.1, 0.32
-MIN_Z, MAX_Z = -0.2, 0.35
+MIN_X, MAX_X = -0.32, 0.32
+MIN_Y, MAX_Y = -0.32, 0.32
+MIN_Z, MAX_Z = -0.3, 0.35
 
 # Joint values for the "home" group_state in open_manipulator_x.srdf, used
 # as the arm's resting pose for the reset button.
@@ -214,9 +219,29 @@ class JoystickTeleopMover(Node):
             self._filtered_axes[i] += SMOOTHING_ALPHA * (raw - self._filtered_axes[i])
         stick_x, stick_y, stick_z = self._filtered_axes
 
-        self.target[0] += FORWARD_AXIS_SIGN  * stick_y * LINEAR_SPEED * dt
-        self.target[1] += SIDE_AXIS_SIGN * -1 * stick_x * LINEAR_SPEED * dt
+        # Z (height) is jogged directly in Cartesian coordinates.
         self.target[2] += VERTICAL_AXIS_SIGN * stick_z * Z_SPEED * dt
+
+        # X/Y are jogged in polar coordinates about the base (radius, theta)
+        # rather than directly in X/Y, because that's what the two stick axes
+        # actually mean physically: left-stick-y is "radially in/out from the
+        # base" and left-stick-x is "rotate about the base". Doing this
+        # directly in X/Y would couple the two controls together (e.g. moving
+        # purely radially would require different X/Y deltas depending on the
+        # current angle).
+        x, y = self.target[0], self.target[1]
+        radius = math.hypot(x, y)
+        dir_x, dir_y = (x / radius, y / radius) if radius > 1e-6 else (1.0, 0.0)
+        radius = max(0.0, radius + FORWARD_AXIS_SIGN * stick_y * LINEAR_SPEED * dt)
+        x, y = radius * dir_x, radius * dir_y
+
+        # Rotate the (possibly radius-adjusted) point about the base Z axis by
+        # a small incremental yaw d_theta -- this is the "rotate about the
+        # base" stick control, applied as a 2D rotation matrix in the XY plane.
+        d_theta = SIDE_AXIS_SIGN * -1 * stick_x * ANGULAR_SPEED * dt
+        cos_t, sin_t = math.cos(d_theta), math.sin(d_theta)
+        self.target[0] = cos_t * x - sin_t * y
+        self.target[1] = sin_t * x + cos_t * y
         self.target[0] = clamp(self.target[0], MIN_X, MAX_X)
         self.target[1] = clamp(self.target[1], MIN_Y, MAX_Y)
         self.target[2] = clamp(self.target[2], MIN_Z, MAX_Z)
@@ -224,10 +249,30 @@ class JoystickTeleopMover(Node):
         if abs(stick_x) < 1e-3 and abs(stick_y) < 1e-3 and abs(stick_z) < 1e-3:
             return
 
+        # Desired end-effector pose: position is the jogged target, orientation
+        # is left as the identity quaternion (w=1) since this teleop only
+        # steers position -- the wrist is free to take whatever orientation
+        # the IK solver finds easiest, it's not being commanded here.
         pose = Pose()
         pose.position.x, pose.position.y, pose.position.z = self.target
         pose.orientation.w = 1.0
 
+        # set_from_ik does NOT command the real servos -- it only mutates
+        # self.robot_state, an in-memory kinematic model living in this
+        # process, solving numerical IK (MoveIt's default KDL/TRAC-IK plugin,
+        # whichever kinematics.yaml configures) for a joint configuration
+        # whose end_effector_link reaches `pose`. The actual hardware only
+        # moves once the resulting joint angles are read back out below and
+        # published as a trajectory (_publish_jog_trajectory), which
+        # ros2_control's arm_controller then executes on the real servos.
+        # Because self.robot_state still
+        # holds the joint values from the *previous* tick when this is called,
+        # that previous solution is implicitly the seed for this one -- IK is
+        # iterative/local, so starting near the last solution both converges
+        # fast (~0.1ms) and keeps consecutive solutions close together instead
+        # of jumping to a different arm configuration that reaches the same
+        # pose. On failure (e.g. target outside reach, or no IK solution within
+        # timeout) robot_state is left unchanged and we just hold position.
         if not self.robot_state.set_from_ik(
                 'arm', pose, END_EFFECTOR_LINK, timeout=IK_TIMEOUT_S):
             self.get_logger().warn(
@@ -235,6 +280,8 @@ class JoystickTeleopMover(Node):
                 throttle_duration_sec=1.0)
             return
 
+        # Read the joint angles IK just solved for and stream them out as a
+        # one-point "jog" trajectory (see _publish_jog_trajectory below).
         self._publish_jog_trajectory(self.robot_state.get_joint_group_positions('arm'))
 
     def _update_gripper(self, joy):
@@ -277,6 +324,14 @@ class JoystickTeleopMover(Node):
         self._filtered_axes = [0.0, 0.0, 0.0]
 
     def _build_trajectory(self, joint_positions, duration_s):
+        # A JointTrajectory normally holds a whole sequence of waypoints for
+        # ros2_control's joint_trajectory_controller to interpolate through
+        # and execute over time. Here it always holds exactly one point:
+        # "get to these joint_positions within duration_s from now". That's
+        # all that's needed because a fresh one-point trajectory is republished
+        # every control tick (see _publish_jog_trajectory) -- each tick's point
+        # just supersedes the last, so the controller is continuously chasing
+        # a slightly-updated goal rather than following a pre-planned path.
         point = JointTrajectoryPoint()
         point.positions = list(joint_positions)
         point.time_from_start.sec = int(duration_s)
@@ -288,6 +343,14 @@ class JoystickTeleopMover(Node):
         return trajectory
 
     def _publish_jog_trajectory(self, joint_positions, duration_s=TRAJECTORY_TIME_S):
+        # "Jog" = the continuous, per-tick nudging described above, published
+        # directly to the controller's command topic (not the action
+        # interface -- see the comment on self.trajectory_pub in __init__ for
+        # why streaming goals through FollowJointTrajectory at 500Hz is
+        # unsafe). duration_s (TRAJECTORY_TIME_S) is deliberately just longer
+        # than one control period so each new one-point trajectory arrives
+        # before the previous one finishes, giving continuous motion instead
+        # of stopping and re-starting every tick.
         self.trajectory_pub.publish(self._build_trajectory(joint_positions, duration_s))
 
     def _send_trajectory(self, joint_positions, duration_s=TRAJECTORY_TIME_S):
