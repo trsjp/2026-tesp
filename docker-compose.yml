@@ -10,7 +10,7 @@ services:
       args:
         USER_UID: ${USER_UID:-1000}
         USER_GID: ${USER_GID:-1000}
-    container_name: tesp_robot_basketball
+    container_name: 2026-tesp-robot-basketball1
     # Mount the whole repository into the container so edits made on the
     # host (or inside the container) are shared both ways. This is also
     # what makes repos cloned on the host by scripts/clone_repos.sh (run
