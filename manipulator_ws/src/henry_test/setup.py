@@ -25,13 +25,9 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            "mover = henry_test.random_mover:main",
-            "listener = henry_test.subscriber_member_function:main",
-            "moveit_py_mover = henry_test.moveit_py_random_mover:main",
-            "moveit_py_teleop = henry_test.moveit_py_joystick_teleop:main",
-            "x_arm_mover = henry_test.x_arm_mover:main",
-            "x_arm_target_publisher = henry_test.x_arm_target_publisher:main",
-            "moveit_py_teleop_ik_guarded = henry_test.moveit_py_joystick_teleop_ik_guarded:main"
+            "moveit_py_teleop_ik_guarded = henry_test.moveit_py_joystick_teleop_ik_guarded:main",
+            "ball_grabber_node = henry_test.ball_grabber_node:main",
+            "ball_position_publisher_example = henry_test.ball_position_publisher_example:main"
         ],
     },
 )
